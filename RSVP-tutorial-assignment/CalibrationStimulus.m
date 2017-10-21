@@ -28,7 +28,7 @@
 
 try; cd(fileparts(mfilename('fullpath')));catch; end;
 try;
-   run ../../matlab/utilities/initPaths.m
+   run ../../buffer_bci/matlab/utilities/initPaths.m
 catch
    msgbox({'Please change to the directory where this file is saved before running the rest of this code'},'Change directory'); 
 end
