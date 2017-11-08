@@ -2,12 +2,12 @@
 % Student		:	Tjalling Haije
 % Student ID	: 	s1011759
 % Course		:	BCI Practical
-% Assignment	: 	Tutorial Feature? ?Attention? ?BCI - stimulus / calibration
-% Date			: 	21-10-2017 
-% Terminology	:	Run = calibration run (new cue)
-%                   Repetition = showing alphabet in random order
+% Assignment	: 	Tutorial Feature Attention BCI - stimulus / calibration
+% Date			: 	31-10-2017 
+% Terminology	:	Sequence = calibration run (new cue)
+%                   Epoch = showing alphabet in random order
 % Description   :   This file does the stimulus generation and the 
-%					calibration phase for the Feature? ?Attention? ?BCI? (RSVP).
+%					calibration phase for the Feature Attention BCI (RSVP).
 %                   It works by presenting a random green letter from the 
 %                   alphabet as cue to the test subject, shown for 2s.
 %                   After clearing the screen for 1s, the alphabet is shown 
@@ -21,7 +21,7 @@
 %                   Important to note is that this script requires user 
 %                   input to run, giving the subject the ability 
 %                   to take a break between calibration runs.
-%                   Each new run (new cue), including the first one, only 
+%                   Each new sequence (new cue), including the first one, only 
 %                   starts after the user presses a key.
 %                           
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,7 +129,7 @@ function x = doEpoch(cueLetter)
     sleepSec(interRepetitionDuration);
     sendEvent('stimulus.epoch','start');
     
-    sendEvent('stimulus.target', cueLetter);
+    %sendEvent('stimulus.target', cueLetter);
     
     % loop through the letters in the alphabet
     for letter=1:numel(alph);
@@ -138,9 +138,12 @@ function x = doEpoch(cueLetter)
         sendEvent('stimulus.letter', alph(letter));
         displayletter(alph(letter));      
         
-        % send a special event if the letter is the target letter
+        % send an event which tells the classifier if it is the target
+        % stimulus
         if(cueLetter == alph(letter))
-            sendEvent('stimulus.targetcue', alph(letter));
+            sendEvent('stimulus.target', '1');
+        else
+            sendEvent('stimulus.target', '0');
         end  
     end;
     

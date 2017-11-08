@@ -1,6 +1,25 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Student		:	Tjalling Haije
+% Student ID	: 	s1011759
+% Course		:	BCI Practical
+% Assignment	: 	Tutorial Feature Attention BCI - stimulus / calibration
+% Date			: 	21-10-2017 
+% Description   :   This file does the signal processing for the calibration
+%					phase. It is triggered by certain events, listens to the
+%					EEG data, and after a certain time or when the end is reached
+%					returns all the data. 
+%					Afterwards all the unnecessary events are filtered out, and 
+%					the data is saved in a matlab file.
+%
+%
+%                   Most of the code is from the tutorial file from Jason
+%                   Farquhar
+%                           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 try; cd(fileparts(mfilename('fullpath')));catch; end;
 try;
-   run ../../buffer_bci/matlab/utilities/initPaths.m
+   run ../../matlab/utilities/initPaths.m
 catch
    msgbox({'Please change to the directory where this file is saved before running the rest of this code'},'Change directory'); 
 end
@@ -19,12 +38,7 @@ while ( isempty(hdr) || ~isstruct(hdr) || (hdr.nchans==0) ) % wait for the buffe
 end;
 
 
-alphabetDuration = 2600;
-% these extra ms are added to ensure that when the cue is showed last, the 
-% P300 signal is also caught
-interLetterDuration = 500;
-
-trlen_ms=alphabetDuration + interLetterDuration;
+trlen_ms= 500;
 dname  ='calibration_data';
 
 % check buffer for events which start with 'startSet' event and record
@@ -32,7 +46,9 @@ dname  ='calibration_data';
 [data,devents,state]=buffer_waitData(buffhost,buffport,[],'startSet',{'stimulus.target'},'trlen_ms',trlen_ms,'exitSet',{'stimulus.training' 'end'})
 
 % remove the end task from the events
-mi=matchEvents(devents,'stimulus.training','end'); devents(mi)=[]; data(mi)=[]; 
+mi=matchEvents(devents,'stimulus.target'); 
+devents=devents(mi); 
+data=data(mi); 
 
 fprintf('Saving %d epochs to : %s\n',numel(devents),dname);
 save(dname,'data','devents');

@@ -1,6 +1,22 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Student		:	Tjalling Haije
+% Student ID	: 	s1011759
+% Course		:	BCI Practical
+% Assignment	: 	Tutorial Feature? ?Attention? ?BCI - stimulus / calibration
+% Date			: 	21-10-2017 
+% Description   :   This file trains an ERP classifier on the event and EEG
+%					data. The frequency band used is targeted at a P300
+%					response.  
+%					Afterwards the classifier is saved to a matlab file.
+%
+%                   Most of the code is from the tutorial file from Jason
+%                   Farquhar
+%                           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 try; cd(fileparts(mfilename('fullpath')));catch; end;
 try;
-   run ../../buffer_bci/matlab/utilities/initPaths.m
+   run ../../matlab/utilities/initPaths.m
 catch
    msgbox({'Please change to the directory where this file is saved before running the rest of this code'},'Change directory'); 
 end
@@ -19,19 +35,15 @@ while ( isempty(hdr) || ~isstruct(hdr) || (hdr.nchans==0) ) % wait for the buffe
   pause(1);
 end;
 
-% Constants
+
 capFile='cap_tmsi_mobita_im.txt';
 overridechnm=1; % capFile channel names override those from the header!
-dname  ='calibration_data';
-cname  ='clsfr';
-freqband = [6 10 26 30];
+dname='calibration_data';
+fname='clsfr';
 
-%useful functions
 load(dname);
-
 % train classifier
-%clsfr=buffer_train_ersp_clsfr(data,devents,hdr,'spatialfilter','slap','freqband',[6 10 26 30],'badchrm',0,'capFile',capFile,'overridechnms',overridechnm);
-clsfr=buffer_train_ersp_clsfr(data,devents,hdr,'spatialfilter','slap','freqband',freqband,'badchrm',0);
-fprintf('Saving classifier to : %s\n',cname);
-save(cname,'-struct','clsfr');
-sendEvent('phase.training','start');
+clsfr=buffer_train_erp_clsfr(data,devents,hdr,'spatialfilter','wht','freqband',[0 .3 10 12],'badchrm',0,'capFile',capFile,'overridechnms',overridechnm);
+% save result
+fprintf(1,'Saving clsfr to : %s',fname);
+save(fname,'-struct','clsfr');

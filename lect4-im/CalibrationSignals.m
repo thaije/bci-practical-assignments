@@ -1,3 +1,14 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Student		:	Tjalling Haije
+% Student ID	: 	s1011759
+% Course		:	BCI Practical
+% Assignment	: 	Tutorial Feature Attention BCI - stimulus / calibration
+% Date			: 	31-10-2017 
+% Description   :   This file does the signal processing of the calibration
+%                   phase. It saves all target events after being
+%                   triggered, and writes these to a file. 
+%                           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try; cd(fileparts(mfilename('fullpath')));catch; end;
 try;
    run ../../matlab/utilities/initPaths.m
@@ -24,15 +35,17 @@ alphabetDuration = 2600;
 % P300 signal is also caught
 interLetterDuration = 500;
 
-trlen_ms=alphabetDuration + interLetterDuration;
+trlen_ms= alphabetDuration + interLetterDuration;
 dname  ='calibration_data';
 
 % check buffer for events which start with 'startSet' event and record
 % events for 'trlen_ms' ms. Stop when 'exitSet' is received
 [data,devents,state]=buffer_waitData(buffhost,buffport,[],'startSet',{'stimulus.target'},'trlen_ms',trlen_ms,'exitSet',{'stimulus.training' 'end'})
 
-% remove the end task from the events
-mi=matchEvents(devents,'stimulus.training','end'); devents(mi)=[]; data(mi)=[]; 
+% Only use stimulus.target events
+mi=matchEvents(devents,'stimulus.target'); 
+devents = devents(mi); 
+data = data(mi); 
 
 fprintf('Saving %d epochs to : %s\n',numel(devents),dname);
 save(dname,'data','devents');

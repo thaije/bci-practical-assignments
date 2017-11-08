@@ -4,31 +4,21 @@
 % Course		:	BCI Practical
 % Assignment	: 	Tutorial Feature? ?Attention? ?BCI - stimulus / calibration
 % Date			: 	21-10-2017 
-% Terminology	:	Run = calibration run (new cue)
-%                   Repetition = showing alphabet in random order
 % Description   :   This file does the stimulus generation and the 
-%					calibration phase for the Feature? ?Attention? ?BCI? (RSVP).
-%                   It works by presenting a random green letter from the 
-%                   alphabet as cue to the test subject, shown for 2s.
-%                   After clearing the screen for 1s, the alphabet is shown 
-%                   in a random order with a duration of 100ms per letter. 
-%                   Each cue is tested by showing the alphabet in random 
-%                   order 5 times, with 2 seconds between repetitions. 
-%                   Furthermore are 10 calibration runs done, each run 
-%                   with a random letter from the alphabet as cue.
-%                   Which makes for a total of 10 calibration runs * 
-%                   5 repetitions = 50 repetitions. 
-%                   Important to note is that this script requires user 
-%                   input to run, giving the subject the ability 
-%                   to take a break between calibration runs.
-%                   Each new run (new cue), including the first one, only 
-%                   starts after the user presses a key.
+%					calibration phase for the Feature Attention BCI (RSVP).
+%					The uses is presented a random green letter from the 
+%					alphabet. Afterwards all letters of the alphabet are
+%					shown in a random order for a short time. 
+%					The alphabet is shown a number of times. Afterwards
+%					the user can take a break, press a letter, and repeat.
+%
+%                   In total 10 sequences runs * 50 epochs each = 50 repetitions. 
 %                           
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 try; cd(fileparts(mfilename('fullpath')));catch; end;
 try;
-   run ../../buffer_bci/matlab/utilities/initPaths.m
+   run ../../matlab/utilities/initPaths.m
 catch
    msgbox({'Please change to the directory where this file is saved before running the rest of this code'},'Change directory'); 
 end
@@ -106,11 +96,11 @@ for i=1:sequences;
     for j=1:epochs;
         sendEvent('stimulus.epoch',j);
         doEpoch(letter); 
-    end
+    end    
     
     % clear the screen
     clearText();
-    sendEvent('stimulus.run','end');
+    sendEvent('stimulus.sequence','end');
     sleepSec(interRunDuration);
 end
 
@@ -125,22 +115,23 @@ function x = doEpoch(cueLetter)
     alph = getShuffledAlphabet();
         
     % Time for the subject to mentally prepare
-    disp("countdown to start epoch")
     sleepSec(interRepetitionDuration);
     sendEvent('stimulus.epoch','start');
     
-    sendEvent('stimulus.target', cueLetter);
+    sendEvent('stimulus.targetCue', cueLetter);
     
     % loop through the letters in the alphabet
     for letter=1:numel(alph);
         
         % display the letter
-        sendEvent('stimulus.letter', alph(letter));
+        ev = sendEvent('stimulus.letter', alph(letter));
         displayletter(alph(letter));      
         
         % send a special event if the letter is the target letter
         if(cueLetter == alph(letter))
-            sendEvent('stimulus.targetcue', alph(letter));
+            sendEvent('stimulus.target', '1', ev.sample);
+        else
+            sendEvent('stimulus.target', '0', ev.sample);
         end  
     end;
     
@@ -198,6 +189,6 @@ end
 % generate a random letter from the alphabet
 function letter = getRandomLetter()
     alph = getShuffledAlphabet();
-    R = round(1+26*rand(1,1));
+    R = round(1+25*rand(1,1));
     letter = alph(R);
 end

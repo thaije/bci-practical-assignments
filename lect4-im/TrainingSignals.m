@@ -1,3 +1,13 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Student		:	Tjalling Haije
+% Student ID	: 	s1011759
+% Course		:	BCI Practical
+% Assignment	: 	Tutorial Feature Attention BCI - stimulus / calibration
+% Date			: 	31-10-2017 
+% Description   :   This file trains a classifier on the calibration data,
+%                   and saves it to a file.
+%                           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 try; cd(fileparts(mfilename('fullpath')));catch; end;
 try;
    run ../../matlab/utilities/initPaths.m
@@ -24,13 +34,13 @@ capFile='cap_tmsi_mobita_im.txt';
 overridechnm=1; % capFile channel names override those from the header!
 dname  ='calibration_data';
 cname  ='clsfr';
+% mu and beta 
 freqband = [6 10 26 30];
 
 %useful functions
 load(dname);
 
 % train classifier
-%clsfr=buffer_train_ersp_clsfr(data,devents,hdr,'spatialfilter','slap','freqband',[6 10 26 30],'badchrm',0,'capFile',capFile,'overridechnms',overridechnm);
 clsfr=buffer_train_ersp_clsfr(data,devents,hdr,'spatialfilter','slap','freqband',freqband,'badchrm',0);
 fprintf('Saving classifier to : %s\n',cname);
 save(cname,'-struct','clsfr');
